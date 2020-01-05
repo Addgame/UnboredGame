@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Game>
+    <Meta
+            image="../games/test game/assets/test.bmp"
+            name="Test Game Name"
+            version="0.0.1"
+            description="Nothing relevant here yet"
+    />
+    <Nodes>
+        <Node id="1" x="100" y="200"/>
+        <Node id="named" x="400" y="50"/>
+        <Node id="2" x="1000" y="700"/>
+        <Node id="out" x="550" y="124"/>
+    </Nodes>
+    <Paths>
+        <Path from="named" to="1"/>
+        <Path from="out" to="named"/>
+        <Path from="out" to="1"/>
+        <Path from="2" to="1"/>
+        <Path from="1" to="out"/>
+        <Path from="out" to="2"/>
+        <Path from="named" to="2"/>
+    </Paths>
+</Game>
