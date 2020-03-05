@@ -1,13 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <map>
-#include <math.h>
+#include <cmath>
 
 #define SDL_MAIN_HANDLED
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_ttf.h"
-#include "pugixml.hpp"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+#include <pugixml/src/pugixml.hpp>
 
 using std::string;
 
@@ -18,6 +18,15 @@ TTF_Font *font;
 
 const SDL_Color BLACK = {0, 0, 0};
 const SDL_Color WHITE = {255, 255, 255};
+
+class Player {
+
+};
+
+class Game {
+public:
+    std::vector<Player> players;
+};
 
 
 class GameMeta {
@@ -170,6 +179,7 @@ enum AppState {
 };
 
 int main() {
+
     AppState state = PREVIEW;
 
     pugi::xml_document doc;
@@ -202,7 +212,12 @@ int main() {
         return 3;
     }
 
-    font = TTF_OpenFont("../MuktaMahee-Regular.ttf", 16);
+    font = TTF_OpenFont("../assets/MuktaMahee-Regular.ttf", 16);
+
+    if (!font) {
+        std::cout << "Error opening font" << std::endl;
+        return 15;
+    }
 
     auto metaNode = doc.child("Game").child("Meta");
     GameMeta staticMeta{metaNode.attribute("name").value(),
@@ -220,7 +235,7 @@ int main() {
         nodes.insert(std::pair<string, Node *>(id, temp));
     }
 
-    if (!nodes.empty()) mainObject.setNode(nodes[nodes.begin()->first]);
+    if (!nodes.empty()) mainObject.setNode(nodes["start"]);
 
     std::vector<Path *> paths;
     for (pugi::xml_node path = doc.child("Game").child("Paths").child("Path"); path; path = path.next_sibling("Path")) {

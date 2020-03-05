@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Game>
     <Meta
-            image="../games/test game/assets/test.bmp"
-            name="Test Game Name"
-            version="0.0.1"
-            description="Nothing relevant here yet"
+            image="../games/test game/assets/preview.bmp"
+            name="Monopoly"
+            version="v1"
+            description="A simple monopoly game"
     />
     <Nodes>
-        <Node id="1" x="100" y="200"/>
-        <Node id="named" x="400" y="50"/>
-        <Node id="2" x="1000" y="700"/>
-        <Node id="out" x="550" y="124"/>
+        <Node id="start" x="1190" y="934"/>
+        <Node id="medi_ave" x="1020" y="934"/>
+        <Node id="reading_rr" x="610" y="934"/>
+        <Node id="jail" x="90" y="914"/>
+        <Node id="free_parking" x="50" y="50"/>
+        <Node id="go_to_jail" x="1190" y="50"/>
     </Nodes>
     <Paths>
-        <Path from="named" to="1"/>
-        <Path from="out" to="named"/>
-        <Path from="out" to="1"/>
-        <Path from="2" to="1"/>
-        <Path from="1" to="out"/>
-        <Path from="out" to="2"/>
-        <Path from="named" to="2"/>
+        <Path from="start" to="medi_ave"/>
+        <Path from="medi_ave" to="reading_rr"/>
+        <Path from="reading_rr" to="jail"/>
+        <Path from="jail" to="free_parking"/>
+        <Path from="free_parking" to="go_to_jail"/>
+        <Path from="go_to_jail" to="start"/>
+        <Path from="go_to_jail" to="jail"/>
     </Paths>
 </Game>
