@@ -3,8 +3,6 @@
 #include <map>
 #include <cmath>
 
-#define SDL_MAIN_HANDLED
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <pugixml/src/pugixml.hpp>
@@ -178,7 +176,7 @@ enum AppState {
     ACTIVE
 };
 
-int main() {
+int main(int argc, char *argv[]) {
 
     AppState state = PREVIEW;
 
