@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Meta name="Monopoly" version="1.0">
+    <Description>Typical monopoly game</Description>
+    <Players min="2" max="8"/>
+    <Instructions>
+        So many instructions to be given for this.
+        I don't know what else to put here for the moment.
+    </Instructions>
+</Meta>

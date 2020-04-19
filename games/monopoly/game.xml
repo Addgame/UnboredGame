@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Game>
-    <Meta
-            image="logo.png"
-            name="Monopoly"
-            version="v1"
-            description="Typical monopoly game"
-            instructions="instructions.txt"
-    />
-
     <Decks>
         <Deck name="chance">
             <Card text="Advance to &quot;Go&quot;. (Collect $200)"/>
@@ -37,7 +29,7 @@
         </Deck>
     </Decks>
 
-    <Players min="2" max="8">
+    <Players> <!--min="2" max="8">-->
         <Layout players="2" type="duel"/>
         <Layout min_players="3" max_players="8" type="clockwise"/>
 
