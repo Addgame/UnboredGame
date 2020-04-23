@@ -25,14 +25,13 @@ Application::~Application() {
     SDL_Quit();
 }
 
-void Application::log(string_view msg) {
+void Application::log(void *userdata, int category, SDL_LogPriority priority, const char *message) {
     time_t now;
     struct tm *ts;
     time(&now);
     ts = localtime(&now);
     printf("[%d-%02d-%02d %02d:%02d:%02d] %s", ts->tm_year + 1900, ts->tm_mon + 1, ts->tm_mday,
-           ts->tm_hour, ts->tm_min, ts->tm_sec, msg.data());
-    //std::cout << "[" << timestamp->tm_year << "-" << err_msg;
+           ts->tm_hour, ts->tm_min, ts->tm_sec, message);
     string_view sdl_error{SDL_GetError()};
     if (!sdl_error.empty()) {
         std::cout << " SDL Error: " << sdl_error;
@@ -63,30 +62,32 @@ void Application::setQuit() {
 }
 
 int Application::run() {
+    SDL_LogSetOutputFunction(Application::log, nullptr);
+
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER | SDL_INIT_EVENTS)) {
-        log("Could not initialize SDL!");
+        SDL_Log("Could not initialize SDL!");
         return 1;
     }
 
     IMG_InitFlags image_flags = IMG_INIT_PNG;
     if (!(IMG_Init(image_flags) & image_flags)) {
-        log("Could not initialize SDL_image!");
+        SDL_Log("Could not initialize SDL_image!");
         return 1;
     }
 
     if (TTF_Init()) {
-        log("Could not initialize SDL_ttf!");
+        SDL_Log("Could not initialize SDL_ttf!");
         return 1;
     }
 
     MIX_InitFlags mix_flags = MIX_INIT_OGG;
     if (!(Mix_Init(mix_flags) & mix_flags)) {
-        log("Could not initialize SDL_mixer file type loading!");
+        SDL_Log("Could not initialize SDL_mixer file type loading!");
         return 1;
     }
 
     if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 1, 2048)) {
-        log("Could not initialize SDL_mixer audio!");
+        SDL_Log("Could not initialize SDL_mixer audio!");
         return 1;
     }
 
@@ -94,17 +95,17 @@ int Application::run() {
     window = SDL_CreateWindow("Unbored Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
                               SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
-        log("Could not create window!");
+        SDL_Log("Could not create window!");
         return 1;
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == nullptr) {
-        log("Could not create renderer!");
+        SDL_Log("Could not create renderer!");
         return 1;
     }
     if (*SDL_GetError()) {
-        log("Non-fatal error.");
+        SDL_Log("Non-fatal error.");
     }
 
     setScreen(new MenuScreen(*this));
@@ -140,6 +141,7 @@ int Application::run() {
             accumulator -= TIMESTEP;
         }
         screen->render();
+        SDL_Delay(10);
     }
 
     screen->hide();

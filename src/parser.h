@@ -5,6 +5,8 @@
 #include <pugixml.hpp>
 #include "game.h"
 
+#include <iostream>
+
 using std::vector;
 
 class GameParser {
@@ -17,7 +19,6 @@ private:
     void clearMetas();
 
 public:
-
     GameParser();
 
     ~GameParser();

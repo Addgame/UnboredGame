@@ -18,9 +18,11 @@ public:
 
     ~Texture();
 
-    bool valid();
+    void render(SDL_Renderer *renderer, SDL_Rect &srcRect, SDL_Rect &dstRect);
 
-    void render(SDL_Renderer *renderer, SDL_Rect &rect);
+    void render(SDL_Renderer *renderer, SDL_Rect &srcRect, int dstX, int dstY);
+
+    void render(SDL_Renderer *renderer, SDL_Rect &dstRect);
 
     void render(SDL_Renderer *renderer, int x, int y);
 };

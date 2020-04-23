@@ -1,6 +1,7 @@
 #include "texture.h"
 
 #include <SDL_image.h>
+#include <stdexcept>
 
 Texture::Texture(SDL_Renderer *renderer, string_view filename, bool useColorKey) : w{0}, h{0} {
     SDL_Surface *tempSurf = IMG_Load(filename.data());
@@ -9,6 +10,8 @@ Texture::Texture(SDL_Renderer *renderer, string_view filename, bool useColorKey)
     }
     texture = SDL_CreateTextureFromSurface(renderer, tempSurf);
     SDL_FreeSurface(tempSurf);
+    if (!texture)
+        throw std::runtime_error("Unable to create texture!");
     SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 }
 
@@ -21,12 +24,17 @@ Texture::~Texture() {
     SDL_DestroyTexture(texture);
 }
 
-bool Texture::valid() {
-    return (texture != nullptr);
+void Texture::render(SDL_Renderer *renderer, SDL_Rect &srcRect, SDL_Rect &dstRect) {
+    SDL_RenderCopy(renderer, texture, &srcRect, &dstRect);
 }
 
-void Texture::render(SDL_Renderer *renderer, SDL_Rect &rect) {
-    SDL_RenderCopy(renderer, texture, nullptr, &rect);
+void Texture::render(SDL_Renderer *renderer, SDL_Rect &srcRect, int dstX, int dstY) {
+    SDL_Rect dstRect = {dstX, dstY, srcRect.w, srcRect.h};
+    render(renderer, srcRect, dstRect);
+}
+
+void Texture::render(SDL_Renderer *renderer, SDL_Rect &dstRect) {
+    SDL_RenderCopy(renderer, texture, nullptr, &dstRect);
 }
 
 void Texture::render(SDL_Renderer *renderer, int x, int y) {

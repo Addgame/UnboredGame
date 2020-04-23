@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "font.h"
 #include "parser.h"
+#include "surface.h"
 
 using std::unique_ptr;
 
@@ -60,11 +61,20 @@ class SelectionScreen : public IScreen {
 private:
     Application &app;
     GameParser gp;
+    unique_ptr<Font> name_font;
+    unique_ptr<Font> small_font;
     unique_ptr<Texture> background;
     unique_ptr<Texture> scrollbar;
-    unique_ptr<Texture> game_bg;
+    unique_ptr<Surface> game_bg;
     unique_ptr<Texture> games_image;
-    int offset;
+    unique_ptr<Texture> game_highlight;
+    SDL_Rect render_rect;
+    const vector<GameMeta *> *metas;
+    unsigned scrollbox_offset;
+    unsigned selected;
+
+    void updateSelect(int delta);
+
 public:
     explicit SelectionScreen(Application &app);
 
@@ -83,6 +93,8 @@ public:
 
 class GameScreen : public IScreen {
 public:
+    explicit GameScreen(Application &app);
+
     void hide() override;
 
     void show() override;

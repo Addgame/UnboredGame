@@ -14,7 +14,7 @@ GameParser::~GameParser() {
 }
 
 void GameParser::clearMetas() {
-    for (auto meta : metas) {
+    for (auto *meta : metas) {
         delete meta;
     }
     metas.clear();
@@ -50,10 +50,14 @@ GameMeta *GameParser::parseMeta(const string &dir_name) {
         return nullptr;
     }
     version = meta_node.attribute("version").value();
+    if (version.empty()) {
+        std::cout << "ERROR: No valid version given for game" << std::endl;
+        return nullptr;
+    }
     description = meta_node.child_value("Description");
     instructions = meta_node.child_value("Instructions");
     std::cout << "Parsing directory: " << dir_name << std::endl;
-    return nullptr;
+    return new GameMeta(name, version, description, instructions, dir_name);
 }
 
 Game *GameParser::parseGame(const string &dir_name) {

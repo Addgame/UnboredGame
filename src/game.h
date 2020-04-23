@@ -8,13 +8,13 @@
 using std::string;
 
 class GameMeta {
-private:
-    uint8_t min_players, max_players;
 public:
     string name;
     string version;
     string description;
     string instructions;
+
+    uint8_t min_players, max_players;
 
     string dir_name;
 

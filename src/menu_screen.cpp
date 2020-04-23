@@ -23,11 +23,11 @@ MenuScreen::MenuScreen(Application &app) : counter{0}, app{app}, r_count{0}, sel
 MenuScreen::~MenuScreen() = default;
 
 void MenuScreen::hide() {
-    std::cout << "hiding " << r_count << " FPS: " << r_count / (counter / 60) << std::endl;
+//    if (counter > 0)
+//        std::cout << "hiding " << r_count << " FPS: " << r_count / (counter / 60) << std::endl;
 }
 
 void MenuScreen::show() {
-    Application::log("showing menu screen");
 }
 
 void MenuScreen::handleEvent(SDL_Event &event) {
@@ -90,26 +90,4 @@ void MenuScreen::render() {
                                     750 + menu_option->h / 2 - options_text->h / 2);
     }
     SDL_RenderPresent(app.renderer);
-}
-
-
-// Game Screen
-void GameScreen::hide() {
-
-}
-
-void GameScreen::show() {
-
-}
-
-void GameScreen::handleEvent(SDL_Event &event) {
-
-}
-
-void GameScreen::update() {
-
-}
-
-void GameScreen::render() {
-
 }

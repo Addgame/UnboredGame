@@ -8,6 +8,10 @@ Font::~Font() {
     TTF_CloseFont(font);
 }
 
+Surface *Font::renderBlended(string_view text, SDL_Color color) {
+    return new Surface(TTF_RenderText_Blended(font, text.data(), color));
+}
+
 Texture *Font::renderBlended(SDL_Renderer *renderer, string_view text, SDL_Color color) {
     SDL_Surface *tempSurf = TTF_RenderText_Blended(font, text.data(), color);
     auto *texture = new Texture(renderer, tempSurf);

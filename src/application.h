@@ -35,7 +35,7 @@ public:
 
     ~Application();
 
-    static void log(string_view msg);
+    static void log(void *userdata, int category, SDL_LogPriority priority, const char *message);
 
     IScreen *getScreen();
 
