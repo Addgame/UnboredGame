@@ -1,30 +1,47 @@
 #ifndef UNBORED_GAME_GAME_H
 #define UNBORED_GAME_GAME_H
 
+struct GameMeta;
+
+class Game;
+
 #include <cstdint>
 #include <string>
-#include <SDL.h>
+#include <vector>
+#include <pugixml/src/pugixml.hpp>
+#include "texture.h"
+#include "application.h"
+#include "token.h"
 
 using std::string;
+using std::vector;
 
-class GameMeta {
-public:
+struct GameMeta {
     string name;
     string version;
     string description;
     string instructions;
 
-    uint8_t min_players, max_players;
-
     string dir_name;
 
-    GameMeta(const string &name, const string &version, const string &description, const string &instructions,
-             const string &filename);
+    uint8_t min_players, max_players;
 };
 
 class Game {
-private:
-    GameMeta *meta;
+public:
+    GameMeta meta;
+
+    vector<unique_ptr<Texture>> backgrounds;
+    unsigned current_bg = 0;
+
+    vector<unique_ptr<Node>> nodes;
+    vector<unique_ptr<Path>> paths;
+
+    vector<unique_ptr<Token>> tokens;
+
+    explicit Game(GameMeta &gm);
+
+    void parse(Application &app, pugi::xml_node node);
 };
 
 #endif //UNBORED_GAME_GAME_H

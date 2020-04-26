@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Game>
-    <Meta
-            image="../games/test game/assets/preview.bmp"
-            name="Monopoly"
-            version="v1"
-            description="A simple monopoly game"
-    />
+    <Background image="bg.bmp"/>
     <Nodes>
         <Node id="start" x="1190" y="934"/>
         <Node id="medi_ave" x="1020" y="934"/>
@@ -18,9 +13,12 @@
         <Path from="start" to="medi_ave"/>
         <Path from="medi_ave" to="reading_rr"/>
         <Path from="reading_rr" to="jail"/>
-        <Path from="jail" to="free_parking"/>
-        <Path from="free_parking" to="go_to_jail"/>
+        <Path from="jail" to="free_parking" speed="20"/>
+        <Path from="free_parking" to="go_to_jail" speed="1"/>
         <Path from="go_to_jail" to="start"/>
         <Path from="go_to_jail" to="jail"/>
     </Paths>
+    <Globals>
+        <Token id="name" image="go.bmp" start="medi_ave"/>
+    </Globals>
 </Game>

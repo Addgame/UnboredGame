@@ -5,19 +5,26 @@
 #include <SDL.h>
 
 #include "connections.h"
+#include "texture.h"
 
 using std::vector;
 
+/*
+ * Token has required attribute
+ *  image (string) - resource location in assets directory
+ * And optional attributes
+ *  start (string) - Node name to start at
+ *  id (string) - an ID to reference this token (TODO: not implemented yet)
+ */
 class Token {
-private:
     Node *currentNode = nullptr;
     Path *currentPath;
     int pathTicks;
 public:
-    SDL_Surface *image;
-    SDL_Rect rect;
+    Texture image;
+    SDL_Rect rect{};
 
-    Token(const string &imageFilename, int x, int y);
+    Token(SDL_Renderer *renderer, const string &imageFilename, int x, int y);
 
     void setPath(Path *newPath);
 
@@ -26,11 +33,10 @@ public:
     void selectOption(int index);
 
     void tick();
-};
 
-class TokenOwner {
-protected:
-    vector<Token *> tokens;
+    static void
+    parse(pugi::xml_node doc_node, const string &dir_name, SDL_Renderer *renderer, vector<unique_ptr<Token>> &token_vec,
+          vector<unique_ptr<Node>> &node_vec);
 };
 
 #endif //UNBORED_GAME_TOKEN_H

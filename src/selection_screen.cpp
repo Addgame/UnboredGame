@@ -7,12 +7,13 @@ using std::make_unique;
 SelectionScreen::SelectionScreen(Application &app) : app{app}, render_rect{0, 0, 448, 1}, metas{nullptr},
                                                      scrollbox_offset{0},
                                                      selected{0} {
+    gp = make_unique<GameParser>(app);
     name_font = make_unique<Font>("../assets/Sen-Bold.ttf", 42);
     small_font = make_unique<Font>("../assets/Sen-Bold.ttf", 26);
     background = make_unique<Texture>(app.renderer, "../assets/gameselection.png");
     scrollbar = make_unique<Texture>(app.renderer, "../assets/scrollbar.png");
     game_bg = make_unique<Surface>(
-            "../assets/smallmenuoption.png"); // make_unique<Texture>(app.renderer, "../assets/smallmenuoption.png");
+            "../assets/smallmenuoption.png");
     game_highlight = make_unique<Texture>(app.renderer, "../assets/smallhighlightborder.png");
     games_image = nullptr;
 }
@@ -26,10 +27,10 @@ void SelectionScreen::hide() {
 void SelectionScreen::show() {
     SDL_Color normal{178, 166, 166};
     SDL_Color light{200, 200, 200};
-    auto &metasRef = gp.parseMetas();
+    auto &metasRef = gp->parseMetas();
     metas = &metasRef;
     unsigned total_height = 104 * metasRef.size();
-    Surface full_surf = SDL_CreateRGBSurface(0, 448, total_height, 32, 0, 0, 0, 0);
+    Surface full_surf = SDL_CreateRGBSurface(0, 448, static_cast<int>(total_height), 32, 0, 0, 0, 0);
     SDL_SetColorKey(full_surf.surface, SDL_TRUE, SDL_MapRGB(full_surf.surface->format, 0xff, 0x00, 0xff));
     full_surf.fill(nullptr, 255, 0, 255, 255);
     for (unsigned i = 0; i < metasRef.size(); i++) {
@@ -58,8 +59,12 @@ void SelectionScreen::handleEvent(SDL_Event &event) {
                 app.setScreen(new MenuScreen(app));
                 break;
             case SDLK_RETURN:
-
-                app.setScreen(new GameScreen(app));
+                Game *game_ptr = gp->parseGame(selected);
+                if (game_ptr) {
+                    app.setScreen(new GameScreen(app, game_ptr));
+                } else {
+                    std::cout << "Error in parsing game!" << std::endl;
+                }
                 break;
         }
     }

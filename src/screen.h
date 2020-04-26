@@ -60,7 +60,7 @@ public:
 class SelectionScreen : public IScreen {
 private:
     Application &app;
-    GameParser gp;
+    unique_ptr<GameParser> gp;
     unique_ptr<Font> name_font;
     unique_ptr<Font> small_font;
     unique_ptr<Texture> background;
@@ -92,8 +92,12 @@ public:
 };
 
 class GameScreen : public IScreen {
+private:
+    Application &app;
+    unique_ptr<Game> game;
+    unsigned update_counter;
 public:
-    explicit GameScreen(Application &app);
+    explicit GameScreen(Application &app, Game *game_ptr);
 
     void hide() override;
 

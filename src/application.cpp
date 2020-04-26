@@ -44,6 +44,7 @@ IScreen *Application::getScreen() {
     return screen;
 }
 
+// delete old defaults to true
 void Application::setScreen(IScreen *new_screen, bool delete_old) {
     IScreen *old_screen = screen;
 

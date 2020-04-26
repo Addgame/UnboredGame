@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Game>
+    <Background image="bg.bmp"/>
     <Decks>
         <Deck name="chance">
             <Card text="Advance to &quot;Go&quot;. (Collect $200)"/>
@@ -29,7 +30,7 @@
         </Deck>
     </Decks>
 
-    <Players> <!--min="2" max="8">-->
+    <Players> <!--min="2" max="8"> this info is in the meta now-->
         <Layout players="2" type="duel"/>
         <Layout min_players="3" max_players="8" type="clockwise"/>
 
