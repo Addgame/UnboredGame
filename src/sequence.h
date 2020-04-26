@@ -14,7 +14,7 @@ using std::unique_ptr;
 class Sequence : public IAction {
 public:
     vector<unique_ptr<IAction>> actions;
-    ICondition *condition;
+    ICondition *condition = nullptr;
 
     void execute(Game &game) override;
 };

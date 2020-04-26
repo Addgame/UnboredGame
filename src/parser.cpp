@@ -23,6 +23,9 @@ void GameParser::clearMetas() {
 const vector<GameMeta *> &GameParser::parseMetas() {
     clearMetas();
     fs::path gamesDir{games_dir};
+    if (!fs::is_directory(gamesDir)) {
+        return metas;
+    }
     for (auto &dir_entry : fs::directory_iterator(gamesDir)) {
         if (!fs::is_directory(dir_entry.status())) {
             continue;

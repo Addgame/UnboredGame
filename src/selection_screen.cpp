@@ -25,6 +25,7 @@ void SelectionScreen::hide() {
 }
 
 void SelectionScreen::show() {
+    // create texture for game list and all the textures for the game details
     SDL_Color normal{178, 166, 166};
     SDL_Color light{200, 200, 200};
     auto &metasRef = gp->parseMetas();

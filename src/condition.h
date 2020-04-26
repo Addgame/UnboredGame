@@ -4,6 +4,7 @@
 #include "game.h"
 
 class ICondition {
+public:
     virtual bool evaluate(Game &game) = 0;
 };
 
