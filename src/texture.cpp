@@ -17,6 +17,8 @@ Texture::Texture(SDL_Renderer *renderer, string_view filename, bool useColorKey)
 
 Texture::Texture(SDL_Renderer *renderer, SDL_Surface *surf) : w{0}, h{0} {
     texture = SDL_CreateTextureFromSurface(renderer, surf);
+    if (!texture)
+        throw std::runtime_error("Unable to create texture from surface!");
     SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
 }
 

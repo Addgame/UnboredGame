@@ -19,6 +19,8 @@ public:
 
     Surface *renderBlended(string_view text, SDL_Color color);
 
+    Surface *renderBlendedWrapped(string_view text, SDL_Color color, Uint32 length);
+
     Texture *renderBlended(SDL_Renderer *renderer, string_view text, SDL_Color color);
 
     Texture *renderSolid(SDL_Renderer *renderer, string_view text, SDL_Color color);

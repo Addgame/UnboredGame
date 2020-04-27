@@ -22,7 +22,7 @@ Surface::Surface(SDL_Surface *from) {
 }
 
 Surface::~Surface() {
-    delete surface;
+    SDL_FreeSurface(surface);
 }
 
 void Surface::fill(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {

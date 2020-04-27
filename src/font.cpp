@@ -12,6 +12,10 @@ Surface *Font::renderBlended(string_view text, SDL_Color color) {
     return new Surface(TTF_RenderText_Blended(font, text.data(), color));
 }
 
+Surface *Font::renderBlendedWrapped(string_view text, SDL_Color color, Uint32 wrap_length) {
+    return new Surface(TTF_RenderText_Blended_Wrapped(font, text.data(), color, wrap_length));
+}
+
 Texture *Font::renderBlended(SDL_Renderer *renderer, string_view text, SDL_Color color) {
     SDL_Surface *tempSurf = TTF_RenderText_Blended(font, text.data(), color);
     auto *texture = new Texture(renderer, tempSurf);

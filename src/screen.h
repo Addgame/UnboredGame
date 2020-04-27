@@ -68,7 +68,9 @@ private:
     unique_ptr<Surface> game_bg;
     unique_ptr<Texture> games_image;
     unique_ptr<Texture> game_highlight;
+    unique_ptr<Surface> detail_bg;
     SDL_Rect render_rect;
+    vector<unique_ptr<Texture>> detail_textures;
     const vector<GameMeta *> *metas;
     unsigned scrollbox_offset;
     unsigned selected;
