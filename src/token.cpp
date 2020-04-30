@@ -22,7 +22,6 @@ void Token::setPath(Path *newPath) {
 }
 
 void Token::setNode(Node *newNode) {
-    std::cout << "setting node: " << newNode->id << " x=" << newNode->x << " y=" << newNode->y << std::endl;
     currentNode = newNode;
     rect.x = newNode->x;
     rect.y = newNode->y;
@@ -35,9 +34,6 @@ void Token::selectOption(int index) {
     if ((index - 1) >= currentNode->outPaths.size()) {
         return;
     }
-    std::cout << "index: " << index << " selected path: " << currentNode->outPaths[index - 1] << " from: "
-              << currentNode->outPaths[index - 1]->from << " to: " << currentNode->outPaths[index - 1]->to
-              << " current x=" << rect.x << " current y=" << rect.y << std::endl;
     setPath(currentNode->outPaths[index - 1]);
 }
 

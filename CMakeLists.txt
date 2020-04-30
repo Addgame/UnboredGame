@@ -19,6 +19,6 @@ include_directories(${SDL2_TTF_INCLUDE_DIR})
 include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 include_directories(${SDL2_MIXER_INCLUDE_DIR})
 
-add_executable(Unbored_Game src/main.cpp src/menu_screen.cpp src/player.cpp src/token.cpp src/scorecard.cpp src/game.cpp src/connections.cpp src/connections.h src/token.h src/player.h src/game.h src/screen.h src/application.h src/application.cpp src/texture.h src/texture.cpp src/font.cpp src/font.h src/parser.cpp src/parser.h src/selection_screen.cpp src/surface.cpp src/surface.h src/game_screen.cpp src/sequence.cpp src/sequence.h src/action.cpp src/action.h src/condition.cpp src/condition.h)
+add_executable(Unbored_Game src/main.cpp src/menu_screen.cpp src/player.cpp src/token.cpp src/scorecard.cpp src/game.cpp src/connections.cpp src/connections.h src/token.h src/player.h src/game.h src/screen.h src/application.h src/application.cpp src/texture.h src/texture.cpp src/font.cpp src/font.h src/parser.cpp src/parser.h src/selection_screen.cpp src/surface.cpp src/surface.h src/game_screen.cpp src/sequence.cpp src/sequence.h src/action.cpp src/action.h src/condition.cpp src/condition.h src/popup.cpp src/popup.h src/variable.cpp src/variable.h)
 target_link_libraries(Unbored_Game ${SDL2_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_MIXER_LIBRARY})
 target_link_libraries(Unbored_Game pugixml)

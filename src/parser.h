@@ -32,7 +32,7 @@ public:
 
     GameMeta *parseMeta(const string &dir_name);
 
-    Game *parseGame(unsigned meta_index);
+    Game *parseGame(unsigned meta_index, uint8_t num_players);
 };
 
 #endif //UNBORED_GAME_PARSER_H

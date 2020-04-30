@@ -12,6 +12,8 @@ class Game;
 #include "texture.h"
 #include "application.h"
 #include "token.h"
+#include "variable.h"
+#include "player.h"
 
 using std::string;
 using std::vector;
@@ -30,6 +32,7 @@ struct GameMeta {
 class Game {
 public:
     GameMeta meta;
+    uint8_t num_players;
 
     vector<unique_ptr<Texture>> backgrounds;
     unsigned current_bg = 0;
@@ -39,7 +42,13 @@ public:
 
     vector<unique_ptr<Token>> tokens;
 
-    explicit Game(GameMeta &gm);
+    VariableContainer variables;
+
+    vector<unique_ptr<Player>> players;
+
+    //IPopup *current_popup = nullptr;
+
+    explicit Game(GameMeta &gm, uint8_t num_players);
 
     void parse(Application &app, pugi::xml_node node);
 };

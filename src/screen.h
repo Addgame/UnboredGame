@@ -8,6 +8,7 @@
 #include "font.h"
 #include "parser.h"
 #include "surface.h"
+#include "popup.h"
 
 using std::unique_ptr;
 
@@ -61,6 +62,7 @@ class SelectionScreen : public IScreen {
 private:
     Application &app;
     unique_ptr<GameParser> gp;
+    unique_ptr<Font> prompt_font;
     unique_ptr<Font> name_font;
     unique_ptr<Font> small_font;
     unique_ptr<Texture> background;
@@ -72,6 +74,7 @@ private:
     SDL_Rect render_rect;
     vector<unique_ptr<Texture>> detail_textures;
     const vector<GameMeta *> *metas;
+    unique_ptr<SelectionIntegerPopup> num_players_popup;
     unsigned scrollbox_offset;
     unsigned selected;
 

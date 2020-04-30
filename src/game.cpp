@@ -1,6 +1,8 @@
 #include "game.h"
 
-Game::Game(GameMeta &gm) : meta{gm} {
+#include <iostream>
+
+Game::Game(GameMeta &gm, uint8_t num_players) : meta{gm}, num_players{num_players} {
 
 }
 
@@ -31,5 +33,56 @@ void Game::parse(Application &app, pugi::xml_node node) {
     // Get tokens
     for (auto current = node.child("Globals").child("Token"); current; current = current.next_sibling("Token")) {
         Token::parse(current, meta.dir_name, app.renderer, tokens, nodes);
+    }
+    // Add system variables then get variables
+    variables.addVariable(new PlayerVariable("current_player", nullptr));
+    variables.addVariable(new IntegerVariable("current_player_number", 0));
+    for (auto current = node.child("Globals").child("BooleanVariable"); current; current = current.next_sibling(
+            "BooleanVariable")) {
+        BooleanVariable::parse(current, variables);
+    }
+    for (auto current = node.child("Globals").child("IntegerVariable"); current; current = current.next_sibling(
+            "IntegerVariable")) {
+        IntegerVariable::parse(current, variables);
+    }
+    for (auto current = node.child("Globals").child("PlayerVariable"); current; current = current.next_sibling(
+            "PlayerVariable")) {
+        PlayerVariable::parse(current, variables);
+    }
+    for (auto current = node.child("Globals").child("TokenVariable"); current; current = current.next_sibling(
+            "TokenVariable")) {
+        TokenVariable::parse(current, variables);
+    }
+    // Get layout then add players
+    Layout layout;
+    layout.parse(node.child("Layouts"), num_players);
+    for (unsigned i = 0; i < num_players; i++) {
+        players.emplace_back(std::make_unique<Player>(layout.locations[i], i));
+        std::cout << "player=" << i << " side=" << static_cast<unsigned>(layout.locations[i]) << std::endl;
+    }
+    // Get player data
+    for (auto current = node.child("Players").child("BooleanVariable"); current; current = current.next_sibling(
+            "BooleanVariable")) {
+        for (auto &player : players) {
+            BooleanVariable::parse(current, player->variables);
+        }
+    }
+    for (auto current = node.child("Players").child("IntegerVariable"); current; current = current.next_sibling(
+            "IntegerVariable")) {
+        for (auto &player : players) {
+            IntegerVariable::parse(current, player->variables);
+        }
+    }
+    for (auto current = node.child("Players").child("PlayerVariable"); current; current = current.next_sibling(
+            "PlayerVariable")) {
+        for (auto &player : players) {
+            PlayerVariable::parse(current, player->variables);
+        }
+    }
+    for (auto current = node.child("Players").child("TokenVariable"); current; current = current.next_sibling(
+            "TokenVariable")) {
+        for (auto &player : players) {
+            TokenVariable::parse(current, player->variables);
+        }
     }
 }

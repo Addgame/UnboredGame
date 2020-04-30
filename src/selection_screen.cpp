@@ -10,6 +10,7 @@ SelectionScreen::SelectionScreen(Application &app) : app{app}, render_rect{0, 0,
                                                      scrollbox_offset{0},
                                                      selected{0} {
     gp = make_unique<GameParser>(app);
+    prompt_font = make_unique<Font>("../assets/Sen-Bold.ttf", 62);
     name_font = make_unique<Font>("../assets/Sen-Bold.ttf", 42);
     small_font = make_unique<Font>("../assets/Sen-Bold.ttf", 26);
     background = make_unique<Texture>(app.renderer, "../assets/gameselection.png");
@@ -94,20 +95,43 @@ void SelectionScreen::handleEvent(SDL_Event &event) {
     if (event.type == SDL_KEYDOWN) {
         switch (event.key.keysym.sym) {
             case SDLK_UP:
-                updateSelect(-1);
+                if (!num_players_popup)
+                    updateSelect(-1);
                 break;
             case SDLK_DOWN:
-                updateSelect(1);
+                if (!num_players_popup)
+                    updateSelect(1);
+                break;
+            case SDLK_LEFT:
+                if (num_players_popup)
+                    num_players_popup->decrement(app.renderer);
+                break;
+            case SDLK_RIGHT:
+                if (num_players_popup)
+                    num_players_popup->increment(app.renderer);
                 break;
             case SDLK_ESCAPE:
                 app.setScreen(new MenuScreen(app));
                 break;
             case SDLK_RETURN:
-                Game *game_ptr = gp->parseGame(selected);
-                if (game_ptr) {
-                    app.setScreen(new GameScreen(app, game_ptr));
+                int min_players = static_cast<int>(metas->at(selected)->min_players);
+                int max_players = static_cast<int>(metas->at(selected)->max_players);
+                if (num_players_popup || (min_players == max_players)) {
+                    Game *game_ptr = gp->parseGame(selected,
+                                                   num_players_popup ? num_players_popup->getValue() : min_players);
+                    if (game_ptr) {
+                        app.setScreen(new GameScreen(app, game_ptr));
+                    } else {
+                        std::cout << "Error in parsing game!" << std::endl;
+                    }
                 } else {
-                    std::cout << "Error in parsing game!" << std::endl;
+                    if (metas->empty()) {
+                        break;
+                    }
+
+                    num_players_popup = make_unique<SelectionIntegerPopup>("Number of Players", app.renderer,
+                                                                           *prompt_font,
+                                                                           min_players, min_players, max_players);
                 }
                 break;
         }
@@ -147,6 +171,9 @@ void SelectionScreen::render() {
     if (!metas->empty()) {
         game_highlight->render(app.renderer, 103, 104 * selected + 142 - render_rect.y);
         detail_textures[selected]->render(app.renderer, 670, 136);
+    }
+    if (num_players_popup) {
+        num_players_popup->render(app.renderer, 240, 212);
     }
     SDL_RenderPresent(app.renderer);
 }

@@ -73,7 +73,7 @@ GameMeta *GameParser::parseMeta(const string &dir_name) {
     return new GameMeta{name, version, description, instructions, dir_name, min_players, max_players};
 }
 
-Game *GameParser::parseGame(unsigned meta_index) {
+Game *GameParser::parseGame(unsigned meta_index, uint8_t num_players) {
     auto &meta_ref = *metas.at(meta_index);
     std::cout << "Parsing full game: " << meta_ref.dir_name << std::endl;
     pugi::xml_parse_result result = xml_doc.load_file((games_dir + meta_ref.dir_name + "/game.xml").c_str());
@@ -81,7 +81,7 @@ Game *GameParser::parseGame(unsigned meta_index) {
         std::cout << "  Could not get parsing game in \"" << meta_ref.dir_name << "\" to happen" << std::endl;
         return nullptr;
     }
-    Game *game = new Game(meta_ref);
+    Game *game = new Game(meta_ref, num_players);
     try {
         game->parse(app, xml_doc.child("Game"));
         std::cout << "  Parsing game successful" << std::endl;

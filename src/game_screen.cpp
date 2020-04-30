@@ -10,19 +10,19 @@ void GameScreen::hide() {
 }
 
 void GameScreen::show() {
-    std::cout << "showing game screen " << game->meta.name << std::endl;
-    std::cout << "number of paths: " << game->paths.size() << "  number of nodes: " << game->nodes.size() << std::endl;
+    /*std::cout << "showing game screen " << game->meta.name << std::endl;*/
+    /*std::cout << "number of paths: " << game->paths.size() << "  number of nodes: " << game->nodes.size() << std::endl;*/
     /*for (auto &path : game->paths) {
         std::cout << "Path: addr=" << &path << " from=" << path.from << " to=" << path.to << " speed=" << path.numTicks << std::endl;
     }
     std::cout << "-----------------" << std::endl;*/
-    for (auto &node : game->nodes) {
+    /*for (auto &node : game->nodes) {
         std::cout << "Node: addr=" << node.get() << " id=" << node->id << " x=" << node->x << " y=" << node->y
                   << " outPaths=" << &(node->outPaths.at(0)) << std::endl;
         for (Path *p : node->outPaths) {
             std::cout << "   path*=" << p << " " << std::endl;
         }
-    }
+    }*/
 }
 
 void GameScreen::handleEvent(SDL_Event &event) {
