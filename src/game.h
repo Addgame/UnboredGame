@@ -14,6 +14,7 @@ class Game;
 #include "token.h"
 #include "variable.h"
 #include "player.h"
+#include "condition.h"
 
 using std::string;
 using std::vector;
@@ -43,6 +44,8 @@ public:
     vector<unique_ptr<Token>> tokens;
 
     VariableContainer variables;
+
+    ConditionContainer conditions;
 
     vector<unique_ptr<Player>> players;
 

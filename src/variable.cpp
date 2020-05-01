@@ -13,43 +13,136 @@ bool VariableContainer::addVariable(Variable *variable) {
     return false;
 }
 
-bool VariableContainer::setBoolVariable(std::string_view id, bool value) {
+void VariableContainer::setBoolVariable(std::string_view id, bool value) {
     auto iter = variable_map.find(id);
     if (iter == variable_map.end()) {
-        return false;
+        throw std::runtime_error("Could not find variable by name");
     }
     auto *var = dynamic_cast<BooleanVariable *>(variable_map[id].get());
     if (!var) {
-        return false;
+        throw std::runtime_error("Referenced variable is not a boolean");
     }
     var->value = value;
-    return true;
 }
 
-bool VariableContainer::setIntVariable(std::string_view id, int value) {
+bool VariableContainer::getBoolVariable(std::string_view id) {
     auto iter = variable_map.find(id);
     if (iter == variable_map.end()) {
-        return false;
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<BooleanVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a boolean");
+    }
+    return var->value;
+}
+
+void VariableContainer::setIntVariable(std::string_view id, int value) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
     }
     auto *var = dynamic_cast<IntegerVariable *>(variable_map[id].get());
     if (!var) {
-        return false;
+        throw std::runtime_error("Referenced variable is not a integer");
     }
     var->value = value;
-    return true;
 }
 
-bool VariableContainer::setPlayerVariable(std::string_view id, Player *value) {
+int VariableContainer::getIntVariable(std::string_view id) {
     auto iter = variable_map.find(id);
     if (iter == variable_map.end()) {
-        return false;
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<IntegerVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a integer");
+    }
+    return var->value;
+}
+
+void VariableContainer::setPlayerVariable(std::string_view id, Player *value) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
     }
     auto *var = dynamic_cast<PlayerVariable *>(variable_map[id].get());
     if (!var) {
-        return false;
+        throw std::runtime_error("Referenced variable is not a Player");
     }
     var->value = value;
-    return true;
+}
+
+Player *VariableContainer::getPlayerVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<PlayerVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Player");
+    }
+    return var->value;
+}
+
+void VariableContainer::setTokenVariable(std::string_view id, Token *value) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<TokenVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Token");
+    }
+    var->value = value;
+}
+
+Token *VariableContainer::getTokenVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<TokenVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Token");
+    }
+    return var->value;
+}
+
+void VariableContainer::setNodeVariable(std::string_view id, Node *value) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<NodeVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Node");
+    }
+    var->value = value;
+}
+
+Node *VariableContainer::getNodeVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<NodeVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Node");
+    }
+    return var->value;
+}
+
+Network *VariableContainer::getNetworkVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<NetworkVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Network");
+    }
+    return &var->value;
 }
 
 void BooleanVariable::parse(pugi::xml_node doc_node, VariableContainer &container) {
@@ -92,4 +185,51 @@ void TokenVariable::parse(pugi::xml_node doc_node, VariableContainer &container)
     if (!container.addVariable(new TokenVariable(id, nullptr))) {
         throw std::runtime_error("Unable to add TokenVariable");
     }
+}
+
+void NodeVariable::parse(pugi::xml_node doc_node, VariableContainer &container) {
+    std::string_view id = doc_node.attribute("name").value();
+    if (id.empty()) {
+        throw std::runtime_error("No valid NodeVariable name given");
+    }
+    if (!container.addVariable(new NodeVariable(id, nullptr))) {
+        throw std::runtime_error("Unable to add NodeVariable");
+    }
+}
+
+void NetworkVariable::parse(pugi::xml_node doc_node, VariableContainer &container) {
+    std::string_view id = doc_node.attribute("name").value();
+    if (id.empty()) {
+        throw std::runtime_error("No valid NetworkVariable name given");
+    }
+    if (!container.addVariable(new NetworkVariable(id))) {
+        throw std::runtime_error("Unable to add NetworkVariable");
+    }
+}
+
+bool Network::contains(Node *node) {
+    for (Node *iter_node : nodes) {
+        if (iter_node == node) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Network::add(Node *node) {
+    nodes.push_back(node);
+}
+
+void Network::remove(Node *node) {
+    for (auto iter = nodes.begin(); iter < nodes.end(); iter++) {
+        if (*iter == node) {
+            nodes.erase(iter);
+            return;
+        }
+    }
+
+}
+
+Node *Network::get(unsigned int index) {
+    return nodes.at(index);
 }

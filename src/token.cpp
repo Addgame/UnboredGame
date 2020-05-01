@@ -4,7 +4,9 @@
 
 using std::make_unique;
 
-Token::Token(SDL_Renderer *renderer, const string &image_filename, int x, int y) : image{renderer, image_filename} {
+Token::Token(SDL_Renderer *renderer, const string &image_filename, int x, int y, bool hidden) : image{renderer,
+                                                                                                      image_filename},
+                                                                                                hidden{hidden} {
     currentPath = nullptr;
     rect.x = x;
     rect.y = y;
@@ -78,6 +80,8 @@ void Token::parse(pugi::xml_node doc_node, const string &dir_name, SDL_Renderer 
             start_node = first_node.get();
         }
     }
-    token_vec.push_back(std::make_unique<Token>(renderer, "../games/" + dir_name + "/assets/" + image_name, x, y));
+    bool hidden = doc_node.attribute("hidden").as_bool(false);
+    token_vec.push_back(
+            std::make_unique<Token>(renderer, "../games/" + dir_name + "/assets/" + image_name, x, y, hidden));
     token_vec.back()->setNode(start_node);
 }

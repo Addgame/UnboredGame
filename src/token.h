@@ -23,8 +23,9 @@ class Token {
 public:
     Texture image;
     SDL_Rect rect{};
+    bool hidden;
 
-    Token(SDL_Renderer *renderer, const string &imageFilename, int x, int y);
+    Token(SDL_Renderer *renderer, const string &imageFilename, int x, int y, bool hidden);
 
     void setPath(Path *newPath);
 

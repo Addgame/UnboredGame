@@ -1,8 +1,9 @@
 #include "game.h"
+#include "condition.h"
 
 #include <iostream>
 
-Game::Game(GameMeta &gm, uint8_t num_players) : meta{gm}, num_players{num_players} {
+Game::Game(GameMeta &gm, uint8_t num_players) : meta{gm}, num_players{num_players}, conditions{*this} {
 
 }
 
@@ -53,12 +54,19 @@ void Game::parse(Application &app, pugi::xml_node node) {
             "TokenVariable")) {
         TokenVariable::parse(current, variables);
     }
+    for (auto current = node.child("Globals").child("NodeVariable"); current; current = current.next_sibling(
+            "NodeVariable")) {
+        NodeVariable::parse(current, variables);
+    }
+    for (auto current = node.child("Globals").child("NetworkVariable"); current; current = current.next_sibling(
+            "NetworkVariable")) {
+        NetworkVariable::parse(current, variables);
+    }
     // Get layout then add players
     Layout layout;
     layout.parse(node.child("Layouts"), num_players);
     for (unsigned i = 0; i < num_players; i++) {
         players.emplace_back(std::make_unique<Player>(layout.locations[i], i));
-        std::cout << "player=" << i << " side=" << static_cast<unsigned>(layout.locations[i]) << std::endl;
     }
     // Get player data
     for (auto current = node.child("Players").child("BooleanVariable"); current; current = current.next_sibling(
@@ -79,10 +87,20 @@ void Game::parse(Application &app, pugi::xml_node node) {
             PlayerVariable::parse(current, player->variables);
         }
     }
-    for (auto current = node.child("Players").child("TokenVariable"); current; current = current.next_sibling(
-            "TokenVariable")) {
+    for (auto current = node.child("Players").child("NodeVariable"); current; current = current.next_sibling(
+            "NodeVariable")) {
         for (auto &player : players) {
-            TokenVariable::parse(current, player->variables);
+            NodeVariable::parse(current, player->variables);
         }
+    }
+    for (auto current = node.child("Players").child("NetworkVariable"); current; current = current.next_sibling(
+            "NetworkVariable")) {
+        for (auto &player : players) {
+            NetworkVariable::parse(current, player->variables);
+        }
+    }
+    // Get conditions
+    for (auto current = node.child("Conditions").first_child(); current; current = current.next_sibling()) {
+        ConditionContainer::parse(current, *this);
     }
 }
