@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Game>
+    <Background image="bg.bmp"/>
+
+    <Nodes>
+        <Node id="start" x="1190" y="934" onTouch="pass_go"/>
+        <Node id="medi_ave" x="1020" y="934" onLand="land_medi_ave"/>
+        <Node id="cc1" x="917" y="934" onLand="land_cc"/>
+        <Node id="baltic_ave" x="814" y="934" onLand="land_baltic_ave"/>
+        <Node id="income_tax" x="711" y="934" onLand="land_income_tax"/>
+        <Node id="reading_rr" x="608" y="934" onLand="land_reading_rr"/>
+        <Node id="oriental_ave" x="505" y="934" onLand="land_oriental_ave"/>
+        <Node id="chance1" x="402" y="934" onLand="land_chance"/>
+        <Node id="vermont_ave" x="299" y="934" onLand="land_vermont_ave"/>
+        <Node id="conn_ave" x="196" y="934" onLand="land_conn_ave"/>
+        <Node id="jail" x="90" y="914"/>
+        <Node id="just_visiting" x="0" y="950"/>
+        <Node id="st_charles_place" x="40" y="800" onLand="land_st_charles"/>
+        <Node id="electric" x="40" y="715" onLand="land_electric"/>
+        <Node id="free_parking" x="50" y="50"/>
+        <Node id="go_to_jail" x="1190" y="50"/>
+    </Nodes>
+
+    <Paths>
+        <Path from="start" to="medi_ave"/>
+        <Path from="medi_ave" to="cc1"/>
+        <Path from="cc1" to="baltic_ave"/>
+        <Path from="baltic_ave" to="income_tax"/>
+        <Path from="income_tax" to="reading_rr"/>
+        <Path from="reading_rr" to="oriental_ave"/>
+        <Path from="oriental_ave" to="chance1"/>
+        <Path from="chance1" to="vermont_ave"/>
+        <Path from="vermont_ave" to="conn_ave"/>
+        <Path from="conn_ave" to="just_visiting"/>
+        <Path from="just_visiting" to="st_charles_place"/>
+        <Path from="st_charles_place" to="electric"/>
+        <Path from="electric" to="free_parking"/>
+        <Path from="jail" to="free_parking" speed="20"/>
+        <Path from="free_parking" to="go_to_jail" speed="1"/>
+        <Path from="go_to_jail" to="start"/>
+        <Path from="go_to_jail" to="jail"/>
+    </Paths>
+
+    <Globals>
+        <Token id="name" image="go.bmp" start="start" hidden="true"/>
+        <Token id="name" image="go.bmp" start="start" hidden="true"/>
+        <BooleanVariable name="temp_bool"/>
+        <BooleanVariable name="temp_resp_bool"/>
+        <PlayerVariable name="iterated_player"/>
+        <PlayerVariable name="temp_player"/>
+        <IntegerVariable name="temp_int" initial="1"/>
+        <IntegerVariable name="moves_left"/>
+        <IntegerVariable name="roll_total"/>
+        <IntegerVariable name="cost"/>
+        <IntegerVariable name="rent"/>
+        <NodeVariable name="temp_node"/>
+    </Globals>
+
+    <Layouts>
+        <Layout min="2" max="8" type="clockwise"/>
+    </Layouts>
+
+    <Players>
+        <TokenVariable name="p_token"/>
+        <IntegerVariable name="p_money" initial="1500"/>
+        <IntegerVariable name="p_temp_int"/>
+        <NetworkVariable name="p_properties"/>
+    </Players>
+
+    <Conditions>
+        <BooleanCondition id="temp_bool_false" variable="temp_bool" invert="true"/>
+        <BooleanCondition id="temp_resp_bool_false" variable="temp_bool"/>
+        <NetworkContainsCondition id="iterated_player_network_has_current_node" variable="p_properties"
+                                  on="iterated_player" has="current_node"/>
+    </Conditions>
+
+    <Sequences>
+        <Sequence id="initialize">
+            <ForEachPlayer player_var="iterated_player">
+                <Sequence>
+                    <TokenPrompt tokens="all" variable="p_token" on="iterated_player">
+                        <Text value="Player "/>
+                        <Reference variable="temp_int"/>
+                        <Text value=" choose your token!"/>
+                    </TokenPrompt>
+                    <SetTokenHidden value="false" variable="p_token" on="iterated_player"/>
+                    <IntegerPrompt initial="2" min="2" max="12" variable="p_temp_int" on="iterated_player">
+                        <Text value="Player "/>
+                        <Reference variable="temp_int"/>
+                        <Text value=" enter your roll total!"/>
+                    </IntegerPrompt>
+                    <AddInt variable="temp_int" value="1"/>
+                </Sequence>
+            </ForEachPlayer>
+            <SetTurnOrderByMax from="p_temp_int"/>
+        </Sequence>
+
+        <Sequence id="begin_turn">
+            <NoticePrompt>
+                <Text value="Player "/>
+                <Reference variable="current_player_number"/>
+                <Text value=", you have $"/>
+                <Reference variable="p_money" on="current_player"/>
+            </NoticePrompt>
+            <IntegerPrompt variable="moves_left" initial="2" min="2" max="12">
+                <Text value="Player "/>
+                <Reference variable="current_player_number"/>
+                <Text value=" enter your roll total!"/>
+            </IntegerPrompt>
+            <SetInt variable="roll_total" valueVar="moves_left"/>
+            <Call id="move_spaces"/>
+        </Sequence>
+
+        <Sequence id="end_turn">
+            <NoticePrompt>
+                <Text value="End of turn. Player "/>
+                <Reference variable="current_player_number"/>
+                <Text value=", you have $"/>
+                <Reference variable="p_money" on="current_player"/>
+            </NoticePrompt>
+        </Sequence>
+
+        <!--Pass in number of spaces to move on moves_left-->
+        <Sequence id="move_spaces">
+            <ForInt variable="moves_left" stop="0" step="-1">
+                <SetTokenPathByIndex variable="token" on="current_player" pathIndex="0"/>
+            </ForInt>
+            <RunLandSequence tokenVar="token" on="current_player"/>
+        </Sequence>
+
+        <Sequence id="pass_go">
+            <AddInt variable="p_money" on="current_player" value="200"/>
+            <NoticePrompt>
+                <Text value="You passed GO and collected $200!"/>
+            </NoticePrompt>
+        </Sequence>
+
+        <Sequence id="common_land">
+            <SetBool variable="temp_bool" value="false"/>
+            <ForEachPlayer player_var="iterated_player">
+                <If condition="temp_bool_false">
+                    <If condition="iterated_player_network_has_current_node">
+                        <SetBool variable="temp_bool" value="true"/>
+                    </If>
+                </If>
+            </ForEachPlayer>
+            <!--not owned-->
+            <If condition="temp_bool_false">
+                <BooleanPrompt variable="temp_resp_bool">
+                    <Text value="Would you like to buy this property for $"/>
+                    <Reference variable="cost"/>
+                </BooleanPrompt>
+                <If condition="temp_resp_bool_true">
+                    <SubInt variable="p_money" on="current_player" valueVar="cost"/>
+                    <AddToNetwork variable="p_properties" on="current_player" valueVar="current_node"/>
+                </If>
+            </If>
+            <!--owned already-->
+            <Unless condition="temp_bool_false">
+                <SubInt variable="p_money" on="current_player" valueVar="rent"/>
+            </Unless>
+        </Sequence>
+
+        <!--Landing sequences for the nodes-->
+        <Sequence id="land_cc">
+            <NoticePrompt>
+                <Text value="Community Chest! No effect this time!"/>
+            </NoticePrompt>
+        </Sequence>
+        <Sequence id="land_chance">
+            <NoticePrompt>
+                <Text value="Chance! No effect this time!"/>
+            </NoticePrompt>
+        </Sequence>
+        <Sequence id="land_medi_ave">
+            <SetInt variable="cost" value="60"/>
+            <SetInt variable="rent" value="2"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_baltic_ave">
+            <SetInt variable="cost" value="60"/>
+            <SetInt variable="rent" value="4"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_income_tax">
+            <SubInt variable="p_money" on="current_player" value="200"/>
+        </Sequence>
+        <Sequence id="land_reading_rr">
+            <SetInt variable="cost" value="200"/>
+            <SetInt variable="rent" value="25"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_oriental_ave">
+            <SetInt variable="cost" value="100"/>
+            <SetInt variable="rent" value="6"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_vermont_ave">
+            <SetInt variable="cost" value="100"/>
+            <SetInt variable="rent" value="6"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_conn_ave">
+            <SetInt variable="cost" value="120"/>
+            <SetInt variable="rent" value="8"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_st_charles">
+            <SetInt variable="cost" value="140"/>
+            <SetInt variable="rent" value="10"/>
+            <Call id="common_land"/>
+        </Sequence>
+        <Sequence id="land_electric">
+            <SetInt variable="cost" value="150"/>
+            <SetInt variable="rent" value="4"/>
+            <MultiplyInt variable="rent" valueVar="roll_total"/>
+            <Call id="common_land"/>
+        </Sequence>
+    </Sequences>
+</Game>
