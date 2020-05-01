@@ -103,4 +103,8 @@ void Game::parse(Application &app, pugi::xml_node node) {
     for (auto current = node.child("Conditions").first_child(); current; current = current.next_sibling()) {
         ConditionContainer::parse(current, *this);
     }
+    // Get sequences
+    for (auto current = node.child("Sequences").child("Sequence"); current; current = current.next_sibling()) {
+        sequences.parse(current, *this);
+    }
 }

@@ -12,6 +12,10 @@ class ICondition {
 public:
     std::string id;
 
+    explicit ICondition(std::string_view id) : id{id} {}
+
+    virtual ~ICondition() = default;
+
     virtual bool evaluate(Game &game) = 0;
 };
 
@@ -25,6 +29,8 @@ public:
     // the container will take over the pointer
     void addCondition(ICondition *condition);
 
+    ICondition *getCondition(std::string_view id);
+
     bool evaluate(std::string_view name);
 
     static void parse(pugi::xml_node doc_node, Game &game);
@@ -36,7 +42,7 @@ private:
     std::string on;
     bool invert;
 public:
-    BooleanCondition(Game &game, std::string_view variable_name, std::string_view on, bool invert);
+    BooleanCondition(Game &game, std::string_view id, std::string_view variable_name, std::string_view on, bool invert);
 
     bool evaluate(Game &game) override;
 };
@@ -48,7 +54,8 @@ private:
     std::string has;
     std::string hasOn;
 public:
-    NetworkContainsCondition(Game &game, std::string_view network, std::string_view on, std::string_view has,
+    NetworkContainsCondition(Game &game, std::string_view id, std::string_view network, std::string_view on,
+                             std::string_view has,
                              std::string_view hasOn);
 
     bool evaluate(Game &game) override;

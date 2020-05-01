@@ -21,8 +21,10 @@ public:
     vector<Path *> outPaths;
     int x, y;
     string id;
+    string land_sequence;
+    string touch_sequence;
 
-    Node(const string &id, int x, int y);
+    Node(const string &id, int x, int y, string_view land_sequence = "", string_view touch_sequence = "");
 
     void addOutPath(Path *path);
 

@@ -29,7 +29,7 @@ void Token::setNode(Node *newNode) {
     rect.y = newNode->y;
 }
 
-void Token::selectOption(int index) {
+void Token::selectOption(unsigned index) {
     if (!currentNode) {
         return;
     }

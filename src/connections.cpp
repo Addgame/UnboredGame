@@ -4,9 +4,11 @@
 
 #include "connections.h"
 
-using std::string_view;
 
-Node::Node(const string &id, int x, int y) {
+Node::Node(const string &id, int x, int y, string_view land_sequence, string_view touch_sequence) : land_sequence{
+        land_sequence},
+                                                                                                    touch_sequence{
+                                                                                                            touch_sequence} {
     this->id = id;
     this->x = x;
     this->y = y;

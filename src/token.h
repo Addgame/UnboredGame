@@ -17,10 +17,10 @@ using std::vector;
  *  id (string) - an ID to reference this token (TODO: not implemented yet)
  */
 class Token {
-    Node *currentNode = nullptr;
     Path *currentPath;
     int pathTicks;
 public:
+    Node *currentNode = nullptr;
     Texture image;
     SDL_Rect rect{};
     bool hidden;
@@ -31,7 +31,7 @@ public:
 
     void setNode(Node *newNode);
 
-    void selectOption(int index);
+    void selectOption(unsigned index);
 
     void tick();
 

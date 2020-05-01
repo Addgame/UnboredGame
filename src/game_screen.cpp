@@ -31,6 +31,25 @@ void GameScreen::handleEvent(SDL_Event &event) {
                 game->tokens[0]->selectOption(4);
                 break;
         }
+        if (game->current_popup) {
+            switch (event.key.keysym.sym) {
+                case SDLK_LEFT:
+                    game->current_popup->pressLeft();
+                    break;
+                case SDLK_RIGHT:
+                    game->current_popup->pressRight();
+                    break;
+                case SDLK_UP:
+                    game->current_popup->pressUp();
+                    break;
+                case SDLK_DOWN:
+                    game->current_popup->pressDown();
+                    break;
+                case SDLK_RETURN:
+                    game->current_popup->pressCenter();
+                    break;
+            }
+        }
     }
 }
 
@@ -54,6 +73,9 @@ void GameScreen::render() {
     for (auto &token : game->tokens) {
         if (!token->hidden)
             token->image.render(app.renderer, token->rect);
+    }
+    if (game->current_popup) {
+        game->current_popup->render(app.renderer, 240, 212);
     }
     SDL_RenderPresent(app.renderer);
 }

@@ -123,6 +123,7 @@ void SelectionScreen::handleEvent(SDL_Event &event) {
                         app.setScreen(new GameScreen(app, game_ptr));
                     } else {
                         std::cout << "Error in parsing game!" << std::endl;
+                        num_players_popup.reset();
                     }
                 } else {
                     if (metas->empty()) {

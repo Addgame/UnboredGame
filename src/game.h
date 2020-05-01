@@ -15,6 +15,8 @@ class Game;
 #include "variable.h"
 #include "player.h"
 #include "condition.h"
+#include "popup.h"
+#include "sequence.h"
 
 using std::string;
 using std::vector;
@@ -47,9 +49,11 @@ public:
 
     ConditionContainer conditions;
 
+    SequenceContainer sequences;
+
     vector<unique_ptr<Player>> players;
 
-    //IPopup *current_popup = nullptr;
+    IPopup *current_popup = nullptr;
 
     explicit Game(GameMeta &gm, uint8_t num_players);
 
