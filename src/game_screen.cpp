@@ -58,6 +58,7 @@ void GameScreen::update() {
         for (auto &token : game->tokens) {
             token->tick();
         }
+        game->update();
     }
     update_counter %= 3;
 }

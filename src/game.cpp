@@ -4,10 +4,35 @@
 #include <iostream>
 
 Game::Game(GameMeta &gm, uint8_t num_players) : meta{gm}, num_players{num_players}, conditions{*this} {
+    for (unsigned i = 0; i < num_players; i++) {
+        player_order.push_back(i);
+    }
+}
 
+void Game::update() {
+    if (current_state == GameState::INITIALIZE) {
+        if (sequences.executeSequence(*this, "initialize")) {
+            current_state = GameState::BEGIN_TURN;
+        }
+    } else if (current_state == GameState::BEGIN_TURN) {
+        if (sequences.executeSequence(*this, "begin_turn")) {
+            current_state = GameState::END_TURN;
+        }
+    } else {
+        if (sequences.executeSequence(*this, "initialize")) {
+            current_player_in_order++;
+            variables.setIntVariable("current_player_index", player_order[current_player_in_order]);
+            variables.setPlayerVariable("current_player", players[player_order[current_player_in_order]].get());
+            current_state = GameState::BEGIN_TURN;
+        }
+    }
 }
 
 void Game::parse(Application &app, pugi::xml_node node) {
+    if (!game_app) {
+        game_app = &app;
+        prompt_font = std::make_unique<Font>("../assets/Sen-Bold.ttf", 62);
+    }
     if (!node) {
         throw std::runtime_error("No valid Game node given");
     }

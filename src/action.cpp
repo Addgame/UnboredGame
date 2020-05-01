@@ -1,6 +1,7 @@
 #include "action.h"
 
 #include "game.h"
+#include "popup.h"
 
 // AddInt
 AddIntAction::AddIntAction(std::string_view variable, std::string_view on, int value, std::string_view valueVar,
@@ -158,11 +159,20 @@ SetTokenPathByIndexAction::SetTokenPathByIndexAction(std::string_view variable, 
 }
 
 bool SetTokenPathByIndexAction::execute(Game &game) {
+    Token *token = nullptr;
     if (on.empty()) {
-        game.variables.getTokenVariable(variable)->selectOption(pathIndex);
+        token = game.variables.getTokenVariable(variable);
     } else {
-        game.variables.getPlayerVariable(on)->variables.getTokenVariable(variable)->selectOption(pathIndex);
+        token = game.variables.getPlayerVariable(on)->variables.getTokenVariable(variable);
     }
+    if (!activated and !token->currentPath) {
+        token->selectOption(pathIndex);
+        activated = true;
+    }
+    if (token->currentPath) {
+        return false;
+    }
+    activated = false;
     return true;
 }
 
@@ -241,6 +251,7 @@ bool RunLandSequenceAction::execute(Game &game) {
     if (!current_node) {
         return true;
     }
+    game.variables.setNodeVariable("current_node", current_node);
     std::string_view seq_id = current_node->land_sequence;
     return game.sequences.executeSequence(game, seq_id);
 }
@@ -271,4 +282,235 @@ std::unique_ptr<IAction> ForEachPlayerAction::parse(pugi::xml_node doc_node, Gam
     auto return_action = std::make_unique<ForEachPlayerAction>(player_var);
     return_action->internal_sequence = std::move(Sequence::parse(doc_node.first_child(), game));
     return return_action;
+}
+
+//ForInt
+ForIntAction::ForIntAction(std::string_view variable, int stop, int step) : variable{variable}, stop{stop}, step{step} {
+}
+
+bool ForIntAction::execute(Game &game) {
+    for (; game.variables.getIntVariable(variable) != stop; game.variables.setIntVariable(variable,
+                                                                                          game.variables.getIntVariable(
+                                                                                                  variable) + step)) {
+        if (!internal_sequence->execute(game)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+std::unique_ptr<IAction> ForIntAction::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view variable = doc_node.attribute("variable").value();
+    int stop = doc_node.attribute("stop").as_int();
+    int step = doc_node.attribute("step").as_int();
+    auto return_action = std::make_unique<ForIntAction>(variable, stop, step);
+    return_action->internal_sequence = std::move(Sequence::parse(doc_node.first_child(), game));
+    return return_action;
+}
+
+
+// SetTurnOrderByMax
+SetTurnOrderByMax::SetTurnOrderByMax(std::string_view from) : from{from} {
+}
+
+bool SetTurnOrderByMax::execute(Game &game) {
+    std::vector<unsigned> &order_vec = game.player_order;
+    for (unsigned i = 0; i < order_vec.size() - 1; i++) {
+        unsigned max_index = i;
+        for (unsigned j = i + 1; j < order_vec.size(); j++) {
+            if (game.players[order_vec[j]]->variables.getIntVariable(from) >
+                game.players[order_vec[max_index]]->variables.getIntVariable(from)) {
+                max_index = j;
+            }
+        }
+        unsigned temp = order_vec[i];
+        order_vec[i] = order_vec[max_index];
+        order_vec[max_index] = temp;
+    }
+    return true;
+}
+
+std::unique_ptr<IAction> SetTurnOrderByMax::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view from = doc_node.attribute("from").value();
+    return std::make_unique<SetTurnOrderByMax>(from);
+}
+
+// NoticePrompt
+
+
+// BooleanPrompt
+BooleanPromptAction::BooleanPromptAction(std::string_view variable, std::string_view on) : variable{variable}, on{on} {
+}
+
+bool BooleanPromptAction::execute(Game &game) {
+    if (!popup) {
+        if (on.empty()) {
+            popup = std::make_unique<BooleanPopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font,
+                                                   game.variables.getRawBoolVariable(variable));
+        } else {
+            popup = std::make_unique<BooleanPopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font,
+                                                   game.variables.getPlayerVariable(on)->variables.getRawBoolVariable(
+                                                           variable));
+        }
+        game.current_popup = popup.get();
+    }
+    if (popup->done) {
+        popup.reset();
+        game.current_popup = nullptr;
+        return true;
+    }
+    return false;
+}
+
+std::unique_ptr<IAction> BooleanPromptAction::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view variable = doc_node.attribute("variable").value();
+    std::string_view on = doc_node.attribute("on").value();
+    auto prompt_var = std::make_unique<BooleanPromptAction>(variable, on);
+    for (auto current = doc_node.first_child(); current; current = current.next_sibling()) {
+        prompt_var->tp.parse(current, game);
+    }
+    return prompt_var;
+}
+
+// Prompt helpers
+TextForPrompt::TextForPrompt(std::string_view raw_text) : raw_text{raw_text} {
+}
+
+std::string TextForPrompt::getValue(Game &game) {
+    return raw_text;
+}
+
+ReferenceForPrompt::ReferenceForPrompt(std::string_view variable, std::string_view on) : variable{variable}, on{on} {
+}
+
+std::string ReferenceForPrompt::getValue(Game &game) {
+    if (on.empty()) {
+        return std::to_string(game.variables.getIntVariable(variable));
+    } else {
+        return std::to_string(game.variables.getPlayerVariable(on)->variables.getIntVariable(variable));
+    }
+}
+
+std::string TextParser::getText(Game &game) {
+    std::string ret_str;
+    for (auto &component : components) {
+        ret_str += component->getValue(game);
+    }
+    return ret_str;
+}
+
+void TextParser::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view type = doc_node.name();
+    if (type == "Text") {
+        std::string_view raw_text = doc_node.attribute("value").value();
+        components.resize(components.size() + 1);
+        components[components.size() - 1] = std::make_unique<TextForPrompt>(raw_text);
+    } else if (type == "Reference") {
+        std::string_view variable = doc_node.attribute("variable").value();
+        std::string_view on = doc_node.attribute("on").value();
+        components.resize(components.size() + 1);
+        components[components.size() - 1] = std::make_unique<ReferenceForPrompt>(variable, on);
+    }
+}
+
+// NoticePrompt
+NoticePromptAction::NoticePromptAction() = default;
+
+bool NoticePromptAction::execute(Game &game) {
+    if (!popup) {
+        popup = std::make_unique<NoticePopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font);
+        game.current_popup = popup.get();
+    }
+    if (popup->done) {
+        popup.reset();
+        game.current_popup = nullptr;
+        return true;
+    }
+    return false;
+}
+
+std::unique_ptr<IAction> NoticePromptAction::parse(pugi::xml_node doc_node, Game &game) {
+    auto prompt_var = std::make_unique<NoticePromptAction>();
+    for (auto current = doc_node.first_child(); current; current = current.next_sibling()) {
+        prompt_var->tp.parse(current, game);
+    }
+    return prompt_var;
+}
+
+// IntegerPrompt
+IntegerPromptAction::IntegerPromptAction(std::string_view variable, std::string_view on, int initial, int min,
+                                         int max) : variable{variable}, on{on}, initial{initial}, min{min}, max{max} {
+}
+
+bool IntegerPromptAction::execute(Game &game) {
+    if (!popup) {
+        if (on.empty()) {
+            popup = std::make_unique<IntegerPopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font,
+                                                   game.variables.getRawIntVariable(variable), initial, min, max);
+        } else {
+            popup = std::make_unique<IntegerPopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font,
+                                                   game.variables.getPlayerVariable(on)->variables.getRawIntVariable(
+                                                           variable), initial, min, max);
+        }
+        game.current_popup = popup.get();
+    }
+    if (popup->done) {
+        popup.reset();
+        game.current_popup = nullptr;
+        return true;
+    }
+    return false;
+}
+
+std::unique_ptr<IAction> IntegerPromptAction::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view variable = doc_node.attribute("variable").value();
+    std::string_view on = doc_node.attribute("on").value();
+    int min = doc_node.attribute("on").as_int();
+    int initial = doc_node.attribute("on").as_int(min);
+    int max = doc_node.attribute("on").as_int();
+    auto prompt_var = std::make_unique<IntegerPromptAction>(variable, on, initial, min, max);
+    for (auto current = doc_node.first_child(); current; current = current.next_sibling()) {
+        prompt_var->tp.parse(current, game);
+    }
+    return prompt_var;
+}
+
+// TokenPrompt
+TokenPromptAction::TokenPromptAction(std::string_view variable, std::string_view on) : variable{variable}, on{on} {
+}
+
+bool TokenPromptAction::execute(Game &game) {
+    if (!popup) {
+        token_reference.clear();
+        for (auto &token : game.tokens) {
+            token_reference.push_back(token.get());
+        }
+        if (on.empty()) {
+            popup = std::make_unique<TokenPopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font,
+                                                 token_reference,
+                                                 game.variables.getRawTokenVariable(variable));
+        } else {
+            popup = std::make_unique<TokenPopup>(tp.getText(game), game.game_app->renderer, *game.prompt_font,
+                                                 token_reference,
+                                                 game.variables.getPlayerVariable(on)->variables.getRawTokenVariable(
+                                                         variable));
+        }
+        game.current_popup = popup.get();
+    }
+    if (popup->done) {
+        popup.reset();
+        game.current_popup = nullptr;
+        return true;
+    }
+    return false;
+}
+
+std::unique_ptr<IAction> TokenPromptAction::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view variable = doc_node.attribute("variable").value();
+    std::string_view on = doc_node.attribute("on").value();
+    auto prompt_var = std::make_unique<TokenPromptAction>(variable, on);
+    for (auto current = doc_node.first_child(); current; current = current.next_sibling()) {
+        prompt_var->tp.parse(current, game);
+    }
+    return prompt_var;
 }

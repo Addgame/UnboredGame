@@ -59,6 +59,18 @@ std::unique_ptr<IAction> Sequence::parse(pugi::xml_node doc_node, Game &game) {
             action_ptr = RunLandSequenceAction::parse(current, game);
         } else if (action_name == "ForEachPlayer") {
             action_ptr = ForEachPlayerAction::parse(current, game);
+        } else if (action_name == "ForInt") {
+            action_ptr = ForIntAction::parse(current, game);
+        } else if (action_name == "SetTurnOrderByMax") {
+            action_ptr = SetTurnOrderByMax::parse(current, game);
+        } else if (action_name == "BooleanPrompt") {
+            action_ptr = BooleanPromptAction::parse(current, game);
+        } else if (action_name == "NoticePrompt") {
+            action_ptr = NoticePromptAction::parse(current, game);
+        } else if (action_name == "IntegerPrompt") {
+            action_ptr = IntegerPromptAction::parse(current, game);
+        } else if (action_name == "TokenPrompt") {
+            action_ptr = TokenPromptAction::parse(current, game);
         }
         seq->actions.resize(seq->actions.size() + 1);
         seq->actions[seq->actions.size() - 1] = std::move(action_ptr);

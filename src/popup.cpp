@@ -102,3 +102,101 @@ void TokenPopup::render(SDL_Renderer *renderer, int x, int y) {
     background->render(renderer, x, y);
     tokens[selected]->image.render(renderer, x + token_loc.x, y + token_loc.y);
 }
+
+NoticePopup::NoticePopup(std::string_view text, SDL_Renderer *renderer, Font &font) {
+    Surface bg_surf{"../assets/popup.png"};
+    SDL_Color white{255, 255, 255};
+    auto text_surf = unique_ptr<Surface>(font.renderBlendedWrapped(text, white, 691));
+    // center is 399.5, 203
+    bg_surf.blit(*text_surf, 399 - text_surf->w / 2, 203 - text_surf->h / 2);
+    background = make_unique<Texture>(renderer, bg_surf.surface);
+}
+
+void NoticePopup::pressCenter() {
+    done = true;
+}
+
+void NoticePopup::render(SDL_Renderer *renderer, int x, int y) {
+    background->render(renderer, x, y);
+}
+
+
+IntegerPopup::IntegerPopup(std::string_view text, SDL_Renderer *renderer, Font &font, IntegerVariable *output_var,
+                           int initial_value, int min, int max) : font{font}, output_var{output_var},
+                                                                  value{initial_value}, min{min}, max{max},
+                                                                  renderer{renderer} {
+    Surface bg_surf{"../assets/integerpopup.png"};
+    SDL_Color white{255, 255, 255};
+    auto text_surf = unique_ptr<Surface>(font.renderBlendedWrapped(text, white, 691));
+    // center is 399.5, 203
+    bg_surf.blit(*text_surf, 399 - text_surf->w / 2, 203 - text_surf->h / 2);
+    background = make_unique<Texture>(renderer, bg_surf.surface);
+    updateValueImage();
+}
+
+void IntegerPopup::updateValueImage() {
+    SDL_Color white{255, 255, 255};
+    value_texture.reset(font.renderBlended(renderer, std::to_string(value), white));
+    value_loc.x = 399 - value_texture->w / 2;
+    value_loc.y = 431 - value_texture->h / 2;
+}
+
+void IntegerPopup::pressLeft() {
+    if (min == max) {
+        value--;
+    } else {
+        if (value <= min) {
+            value = max;
+        } else {
+            value--;
+        }
+    }
+    updateValueImage();
+}
+
+void IntegerPopup::pressRight() {
+    if (min == max) {
+        value++;
+    } else {
+        if (value >= max) {
+            value = min;
+        } else {
+            value++;
+        }
+    }
+    updateValueImage();
+}
+
+void IntegerPopup::pressCenter() {
+    output_var->value = value;
+    done = true;
+}
+
+void IntegerPopup::render(SDL_Renderer *sdlRenderer, int x, int y) {
+    background->render(sdlRenderer, x, y);
+    value_texture->render(sdlRenderer, x + value_loc.x, y + value_loc.y);
+}
+
+BooleanPopup::BooleanPopup(std::string_view text, SDL_Renderer *renderer, Font &font, BooleanVariable *output_var)
+        : output_var{output_var} {
+    Surface bg_surf{"../assets/boolpopup.png"};
+    SDL_Color white{255, 255, 255};
+    auto text_surf = unique_ptr<Surface>(font.renderBlendedWrapped(text, white, 691));
+    // center is 399.5, 203
+    bg_surf.blit(*text_surf, 399 - text_surf->w / 2, 203 - text_surf->h / 2);
+    background = make_unique<Texture>(renderer, bg_surf.surface);
+}
+
+void BooleanPopup::pressLeft() {
+    output_var->value = true;
+    done = true;
+}
+
+void BooleanPopup::pressRight() {
+    output_var->value = false;
+    done = true;
+}
+
+void BooleanPopup::render(SDL_Renderer *renderer, int x, int y) {
+    background->render(renderer, x, y);
+}

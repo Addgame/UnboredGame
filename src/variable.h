@@ -120,9 +120,13 @@ public:
 
     bool getBoolVariable(std::string_view id);
 
+    BooleanVariable *getRawBoolVariable(std::string_view id);
+
     void setIntVariable(std::string_view id, int value);
 
     int getIntVariable(std::string_view id);
+
+    IntegerVariable *getRawIntVariable(std::string_view id);
 
     void setPlayerVariable(std::string_view id, Player *value);
 
@@ -131,6 +135,8 @@ public:
     void setTokenVariable(std::string_view id, Token *value);
 
     Token *getTokenVariable(std::string_view id);
+
+    TokenVariable *getRawTokenVariable(std::string_view id);
 
     void setNodeVariable(std::string_view id, Node *value);
 

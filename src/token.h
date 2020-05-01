@@ -17,9 +17,9 @@ using std::vector;
  *  id (string) - an ID to reference this token (TODO: not implemented yet)
  */
 class Token {
+public:
     Path *currentPath;
     int pathTicks;
-public:
     Node *currentNode = nullptr;
     Texture image;
     SDL_Rect rect{};

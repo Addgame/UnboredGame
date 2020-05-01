@@ -32,10 +32,23 @@ struct GameMeta {
     uint8_t min_players, max_players;
 };
 
+enum class GameState {
+    INITIALIZE = 0,
+    BEGIN_TURN = 1,
+    END_TURN = 2
+};
+
 class Game {
 public:
     GameMeta meta;
     uint8_t num_players;
+
+    Application *game_app = nullptr;
+
+    std::unique_ptr<Font> prompt_font = nullptr;
+
+    GameState current_state = GameState::INITIALIZE;
+    Sequence *current_sequence = nullptr;
 
     vector<unique_ptr<Texture>> backgrounds;
     unsigned current_bg = 0;
@@ -52,10 +65,14 @@ public:
     SequenceContainer sequences;
 
     vector<unique_ptr<Player>> players;
+    vector<unsigned> player_order;
+    unsigned current_player_in_order = 0;
 
     IPopup *current_popup = nullptr;
 
     explicit Game(GameMeta &gm, uint8_t num_players);
+
+    void update();
 
     void parse(Application &app, pugi::xml_node node);
 };

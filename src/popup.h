@@ -31,15 +31,56 @@ public:
 };
 
 class NoticePopup : public IPopup {
+private:
+    unique_ptr<Texture> background;
 
+public:
+    NoticePopup(std::string_view text, SDL_Renderer *renderer, Font &font);
+
+    void pressCenter() override;
+
+    void render(SDL_Renderer *renderer, int x, int y) override;
 };
 
 class BooleanPopup : public IPopup {
+private:
+    unique_ptr<Texture> background;
+    BooleanVariable *output_var;
 
+public:
+    BooleanPopup(std::string_view text, SDL_Renderer *renderer, Font &font, BooleanVariable *output_var);
+
+    void pressLeft() override;
+
+    void pressRight() override;
+
+    void render(SDL_Renderer *renderer, int x, int y) override;
 };
 
 class IntegerPopup : public IPopup {
+private:
+    unique_ptr<Texture> background;
+    unique_ptr<Texture> value_texture;
+    Font &font;
+    SDL_Renderer *renderer;
+    SDL_Point value_loc;
+    IntegerVariable *output_var;
+    int value;
+    int min, max;
 
+    void updateValueImage();
+
+public:
+    IntegerPopup(std::string_view text, SDL_Renderer *renderer, Font &font, IntegerVariable *output_var,
+                 int initial_value, int min = 0, int max = 0);
+
+    void pressLeft() override;
+
+    void pressRight() override;
+
+    void pressCenter() override;
+
+    void render(SDL_Renderer *sdlRenderer, int x, int y) override;
 };
 
 class SelectionIntegerPopup : public IPopup {

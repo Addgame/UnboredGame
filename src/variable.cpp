@@ -37,6 +37,18 @@ bool VariableContainer::getBoolVariable(std::string_view id) {
     return var->value;
 }
 
+BooleanVariable *VariableContainer::getRawBoolVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<BooleanVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a boolean");
+    }
+    return var;
+}
+
 void VariableContainer::setIntVariable(std::string_view id, int value) {
     auto iter = variable_map.find(id);
     if (iter == variable_map.end()) {
@@ -59,6 +71,18 @@ int VariableContainer::getIntVariable(std::string_view id) {
         throw std::runtime_error("Referenced variable is not a integer");
     }
     return var->value;
+}
+
+IntegerVariable *VariableContainer::getRawIntVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<IntegerVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a integer");
+    }
+    return var;
 }
 
 void VariableContainer::setPlayerVariable(std::string_view id, Player *value) {
@@ -107,6 +131,18 @@ Token *VariableContainer::getTokenVariable(std::string_view id) {
         throw std::runtime_error("Referenced variable is not a Token");
     }
     return var->value;
+}
+
+TokenVariable *VariableContainer::getRawTokenVariable(std::string_view id) {
+    auto iter = variable_map.find(id);
+    if (iter == variable_map.end()) {
+        throw std::runtime_error("Could not find variable by name");
+    }
+    auto *var = dynamic_cast<TokenVariable *>(variable_map[id].get());
+    if (!var) {
+        throw std::runtime_error("Referenced variable is not a Token");
+    }
+    return var;
 }
 
 void VariableContainer::setNodeVariable(std::string_view id, Node *value) {
