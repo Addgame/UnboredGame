@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Meta name="Test Game" version="0.1.0-dev">
+<Meta name="Monopoly Demo" version="final">
     <Description>Test game that is just monopoly but set up to provide a minimal example of the functionality of the
         game system. This will be the demonstration for the final presentation.
     </Description>
-    <Players min="2" max="8"/>
+    <Players min="2" max="4"/>
     <Instructions>
         Still words here that will be the instructions for how to play this game.
     </Instructions>

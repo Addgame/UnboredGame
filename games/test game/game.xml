@@ -42,8 +42,10 @@
     </Paths>
 
     <Globals>
-        <Token id="name" image="go.bmp" start="start" hidden="true"/>
-        <Token id="name" image="go.bmp" start="start" hidden="true"/>
+        <Token id="iron" image="iron.bmp" start="start" hidden="true"/>
+        <Token id="thimble" image="thimble.bmp" start="start" hidden="true"/>
+        <Token id="wheelbarrow" image="wheelbarrow.bmp" start="start" hidden="true"/>
+        <Token id="racecar" image="racecar.bmp" start="start" hidden="true"/>
         <BooleanVariable name="temp_bool"/>
         <BooleanVariable name="temp_resp_bool"/>
         <PlayerVariable name="iterated_player"/>
@@ -69,7 +71,7 @@
 
     <Conditions>
         <BooleanCondition id="temp_bool_false" variable="temp_bool" invert="true"/>
-        <BooleanCondition id="temp_resp_bool_false" variable="temp_bool"/>
+        <BooleanCondition id="temp_resp_bool_true" variable="temp_resp_bool"/>
         <NetworkContainsCondition id="iterated_player_network_has_current_node" variable="p_properties"
                                   on="iterated_player" has="current_node"/>
     </Conditions>
@@ -123,9 +125,11 @@
         <!--Pass in number of spaces to move on moves_left-->
         <Sequence id="move_spaces">
             <ForInt variable="moves_left" stop="0" step="-1">
-                <SetTokenPathByIndex variable="token" on="current_player" pathIndex="0"/>
+                <Sequence>
+                    <SetTokenPathByIndex variable="p_token" on="current_player" pathIndex="0"/>
+                </Sequence>
             </ForInt>
-            <RunLandSequence tokenVar="token" on="current_player"/>
+            <RunLandSequence tokenVar="p_token" on="current_player"/>
         </Sequence>
 
         <Sequence id="pass_go">
@@ -158,6 +162,11 @@
             <!--owned already-->
             <Unless condition="temp_bool_false">
                 <SubInt variable="p_money" on="current_player" valueVar="rent"/>
+                <NoticePrompt>
+                    <Text value="You paid $"/>
+                    <Reference variable="rent"/>
+                    <Text value=" in rent!"/>
+                </NoticePrompt>
             </Unless>
         </Sequence>
 

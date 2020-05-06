@@ -92,9 +92,8 @@ int Application::run() {
         return 1;
     }
 
-    // TODO: Add SDL_WINDOW_FULLSCREEN later
     window = SDL_CreateWindow("Unbored Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
-                              SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+                              SCREEN_HEIGHT, SDL_WINDOW_SHOWN); // || SDL_WINDOW_FULLSCREEN);
     if (window == nullptr) {
         SDL_Log("Could not create window!");
         return 1;

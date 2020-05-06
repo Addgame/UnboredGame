@@ -17,7 +17,7 @@ void GameScreen::handleEvent(SDL_Event &event) {
         switch (event.key.keysym.sym) {
             case SDLK_ESCAPE:
                 app.setScreen(new MenuScreen(app));
-                break;
+                return;
             case SDLK_1:
                 game->tokens[0]->selectOption(1);
                 break;
@@ -64,13 +64,13 @@ void GameScreen::update() {
 }
 
 void GameScreen::render() {
-    Texture texture{app.renderer, "../assets/marker.png"};
+    //Texture texture{app.renderer, "../assets/marker.png"};
     SDL_SetRenderDrawColor(app.renderer, 255, 255, 255, 255);
     SDL_RenderClear(app.renderer);
     game->backgrounds[game->current_bg]->render(app.renderer, 0, 0);
-    for (auto &node : game->nodes) {
+    /*for (auto &node : game->nodes) {
         texture.render(app.renderer, node->x, node->y);
-    }
+    }*/
     for (auto &token : game->tokens) {
         if (!token->hidden)
             token->image.render(app.renderer, token->rect);

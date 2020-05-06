@@ -45,6 +45,8 @@ std::unique_ptr<IAction> Sequence::parse(pugi::xml_node doc_node, Game &game) {
             action_ptr = SubIntAction::parse(current, game);
         } else if (action_name == "SetInt") {
             action_ptr = SetIntAction::parse(current, game);
+        } else if (action_name == "MultiplyInt") {
+            action_ptr = MultiplyIntAction::parse(current, game);
         } else if (action_name == "SetBool") {
             action_ptr = SetBoolAction::parse(current, game);
         } else if (action_name == "Call") {
@@ -71,6 +73,8 @@ std::unique_ptr<IAction> Sequence::parse(pugi::xml_node doc_node, Game &game) {
             action_ptr = IntegerPromptAction::parse(current, game);
         } else if (action_name == "TokenPrompt") {
             action_ptr = TokenPromptAction::parse(current, game);
+        } else {
+            throw std::runtime_error("Unknown action name found in sequence");
         }
         seq->actions.resize(seq->actions.size() + 1);
         seq->actions[seq->actions.size() - 1] = std::move(action_ptr);

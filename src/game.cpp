@@ -12,6 +12,8 @@ Game::Game(GameMeta &gm, uint8_t num_players) : meta{gm}, num_players{num_player
 void Game::update() {
     if (current_state == GameState::INITIALIZE) {
         if (sequences.executeSequence(*this, "initialize")) {
+            variables.setIntVariable("current_player_number", player_order[current_player_in_order] + 1);
+            variables.setPlayerVariable("current_player", players[player_order[current_player_in_order]].get());
             current_state = GameState::BEGIN_TURN;
         }
     } else if (current_state == GameState::BEGIN_TURN) {
@@ -19,9 +21,12 @@ void Game::update() {
             current_state = GameState::END_TURN;
         }
     } else {
-        if (sequences.executeSequence(*this, "initialize")) {
+        if (sequences.executeSequence(*this, "end_turn")) {
             current_player_in_order++;
-            variables.setIntVariable("current_player_index", player_order[current_player_in_order]);
+            if (current_player_in_order >= num_players) {
+                current_player_in_order = 0;
+            }
+            variables.setIntVariable("current_player_number", player_order[current_player_in_order] + 1);
             variables.setPlayerVariable("current_player", players[player_order[current_player_in_order]].get());
             current_state = GameState::BEGIN_TURN;
         }
@@ -63,6 +68,7 @@ void Game::parse(Application &app, pugi::xml_node node) {
     // Add system variables then get variables
     variables.addVariable(new PlayerVariable("current_player", nullptr));
     variables.addVariable(new IntegerVariable("current_player_number", 0));
+    variables.addVariable(new NodeVariable("current_node", nullptr));
     for (auto current = node.child("Globals").child("BooleanVariable"); current; current = current.next_sibling(
             "BooleanVariable")) {
         BooleanVariable::parse(current, variables);
@@ -110,6 +116,12 @@ void Game::parse(Application &app, pugi::xml_node node) {
             "PlayerVariable")) {
         for (auto &player : players) {
             PlayerVariable::parse(current, player->variables);
+        }
+    }
+    for (auto current = node.child("Players").child("TokenVariable"); current; current = current.next_sibling(
+            "TokenVariable")) {
+        for (auto &player : players) {
+            TokenVariable::parse(current, player->variables);
         }
     }
     for (auto current = node.child("Players").child("NodeVariable"); current; current = current.next_sibling(

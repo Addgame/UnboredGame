@@ -39,8 +39,11 @@ std::unique_ptr<Node> Node::parse(pugi::xml_node doc_node, vector<unique_ptr<Nod
         throw std::runtime_error("No valid y given to node");
     }
     int node_y = doc_node.attribute("y").as_int();
-
-    return std::make_unique<Node>(node_id, node_x, node_y);
+    // onLand
+    string land_id = doc_node.attribute("onLand").value();
+    // onTouch
+    string touch_id = doc_node.attribute("onTouch").value();
+    return std::make_unique<Node>(node_id, node_x, node_y, land_id, touch_id);
 }
 
 Node *Node::getNodeByName(vector<unique_ptr<Node>> &node_list, string_view name) {

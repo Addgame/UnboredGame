@@ -83,7 +83,7 @@ void TokenPopup::pressLeft() {
 }
 
 void TokenPopup::pressRight() {
-    if (selected == tokens.size()) {
+    if (selected == tokens.size() - 1) {
         selected = 0;
     } else {
         selected++;

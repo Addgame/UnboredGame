@@ -105,6 +105,43 @@ std::unique_ptr<IAction> SetIntAction::parse(pugi::xml_node doc_node, Game &game
     return std::make_unique<SetIntAction>(variable, on, value, valueVar, valueOn);
 }
 
+// MultiplyInt
+MultiplyIntAction::MultiplyIntAction(std::string_view variable, std::string_view on, int value,
+                                     std::string_view valueVar,
+                                     std::string_view valueOn) : variable{variable}, on{on}, value{value},
+                                                                 valueVar{valueVar},
+                                                                 valueOn{valueOn} {
+}
+
+bool MultiplyIntAction::execute(Game &game) {
+    int value_to_use = value;
+    if (!valueVar.empty()) {
+        if (valueOn.empty()) {
+            value_to_use = game.variables.getIntVariable(valueVar);
+        } else {
+            value_to_use = game.variables.getPlayerVariable(valueOn)->variables.getIntVariable(valueVar);
+        }
+    }
+    int original_value;
+    if (on.empty()) {
+        original_value = game.variables.getIntVariable(variable);
+        game.variables.setIntVariable(variable, original_value * value_to_use);
+    } else {
+        original_value = game.variables.getPlayerVariable(on)->variables.getIntVariable(variable);
+        game.variables.getPlayerVariable(on)->variables.setIntVariable(variable, original_value * value_to_use);
+    }
+    return true;
+}
+
+std::unique_ptr<IAction> MultiplyIntAction::parse(pugi::xml_node doc_node, Game &game) {
+    std::string_view variable = doc_node.attribute("variable").value();
+    std::string_view on = doc_node.attribute("on").value();
+    int value = doc_node.attribute("value").as_int();
+    std::string_view valueVar = doc_node.attribute("valueVar").value();
+    std::string_view valueOn = doc_node.attribute("valueOn").value();
+    return std::make_unique<MultiplyIntAction>(variable, on, value, valueVar, valueOn);
+}
+
 // SetBool
 SetBoolAction::SetBoolAction(std::string_view variable, std::string_view on, bool value, std::string_view valueVar,
                              std::string_view valueOn) : variable{variable}, on{on}, value{value}, valueVar{valueVar},
@@ -166,7 +203,7 @@ bool SetTokenPathByIndexAction::execute(Game &game) {
         token = game.variables.getPlayerVariable(on)->variables.getTokenVariable(variable);
     }
     if (!activated and !token->currentPath) {
-        token->selectOption(pathIndex);
+        token->selectOption(pathIndex + 1);
         activated = true;
     }
     if (token->currentPath) {
@@ -253,13 +290,16 @@ bool RunLandSequenceAction::execute(Game &game) {
     }
     game.variables.setNodeVariable("current_node", current_node);
     std::string_view seq_id = current_node->land_sequence;
+    if (seq_id.empty()) {
+        return true;
+    }
     return game.sequences.executeSequence(game, seq_id);
 }
 
 std::unique_ptr<IAction> RunLandSequenceAction::parse(pugi::xml_node doc_node, Game &game) {
-    std::string_view variable = doc_node.attribute("variable").value();
+    std::string_view tokenVar = doc_node.attribute("tokenVar").value();
     std::string_view on = doc_node.attribute("on").value();
-    return std::make_unique<RunLandSequenceAction>(variable, on);
+    return std::make_unique<RunLandSequenceAction>(tokenVar, on);
 }
 
 //ForEachPlayer
@@ -465,9 +505,9 @@ bool IntegerPromptAction::execute(Game &game) {
 std::unique_ptr<IAction> IntegerPromptAction::parse(pugi::xml_node doc_node, Game &game) {
     std::string_view variable = doc_node.attribute("variable").value();
     std::string_view on = doc_node.attribute("on").value();
-    int min = doc_node.attribute("on").as_int();
-    int initial = doc_node.attribute("on").as_int(min);
-    int max = doc_node.attribute("on").as_int();
+    int min = doc_node.attribute("min").as_int();
+    int initial = doc_node.attribute("initial").as_int(min);
+    int max = doc_node.attribute("max").as_int();
     auto prompt_var = std::make_unique<IntegerPromptAction>(variable, on, initial, min, max);
     for (auto current = doc_node.first_child(); current; current = current.next_sibling()) {
         prompt_var->tp.parse(current, game);

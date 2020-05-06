@@ -81,6 +81,23 @@ public:
 };
 
 // variable - to be altered, on - if on player, value - if static value, valueVar - take from, valueOn - if valueVar on player
+class MultiplyIntAction : public IAction {
+private:
+    std::string variable;
+    std::string on;
+    int value;
+    std::string valueVar;
+    std::string valueOn;
+public:
+    MultiplyIntAction(std::string_view variable, std::string_view on, int value, std::string_view valueVar,
+                      std::string_view valueOn);
+
+    bool execute(Game &game) override;
+
+    static std::unique_ptr<IAction> parse(pugi::xml_node doc_node, Game &game);
+};
+
+// variable - to be altered, on - if on player, value - if static value, valueVar - take from, valueOn - if valueVar on player
 class SetBoolAction : public IAction {
 private:
     std::string variable;

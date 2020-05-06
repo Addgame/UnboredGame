@@ -1,3 +1,4 @@
+#include <iostream>
 #include "variable.h"
 
 bool VariableContainer::exists(std::string_view id) {

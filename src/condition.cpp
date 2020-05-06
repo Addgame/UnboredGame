@@ -37,10 +37,18 @@ void ConditionContainer::addCondition(ICondition *condition) {
 }
 
 bool ConditionContainer::evaluate(std::string_view name) {
+    auto iter = condition_map.find(name);
+    if (iter == condition_map.end()) {
+        throw std::runtime_error("Could not evaluate condition by name");
+    }
     return condition_map.at(name)->evaluate(game);
 }
 
 ICondition *ConditionContainer::getCondition(std::string_view id) {
+    auto iter = condition_map.find(id);
+    if (iter == condition_map.end()) {
+        throw std::runtime_error("Could not get condition by name");
+    }
     return condition_map.at(id).get();
 }
 
